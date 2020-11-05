@@ -1,6 +1,7 @@
 import React from 'react'
 import './App.css';
 import {CardList} from './components/card-list/card-list.component'
+import {SearchBox} from './components/search-box/search-box.component'
 
 class App extends React.Component
 {
@@ -24,8 +25,11 @@ class App extends React.Component
           }
         ]
       }
-
-      this.handleChange = this.handleChange.bind(this);
+      
+      // Javascript feature. Javascript methods has to know their context 
+      // ( My guess: so that everytime "this" pointer is used, it will refer to that context? Or to be able to have a reference to that function using 'this' pointer ) 
+      // Can use arrow func instead. Arrow functions are automatically binded to class they're contained within. So do anonymous functions
+      this.handleChange = this.handleChange.bind(this); 
   }
   
   componentDidMount()
@@ -37,22 +41,30 @@ class App extends React.Component
 
   handleChange(event)
   {
-    const {type, name, value} = event.target
+    const {type, name, className, value} = event.target
     this.setState(prevState => {
       return {
-        [name]: value,
-        monsters: this.state.monsters.filter(element => element.name === value)
+        [name]: value
       }
-    })
+    }, () => console.log(this.state))
+
+    // this.setState(func to set state, callback) is an asyncronous function 
   }
   
   render()
   {
+    const {monsters, searchField} = this.state;
+    const filteredList = monsters.filter(element => element.name.toLowerCase().includes(searchField.toLowerCase()))
     return (
       <div className="App">
-        <input type='text' onChange={this.handleChange} value={this.state.searchField} name='searchField'/>
+        <h1 className='title'>Monsters Rolodex</h1>
+        <SearchBox 
+          placeholder='Search Monsters'
+          onChange={this.handleChange}
+          value={this.state.searchField}
+          name='searchField'/>
         <br/>
-        <CardList monsters={this.state.monsters}/>
+        <CardList monsters={filteredList}/>
       </div>
     );
   }
